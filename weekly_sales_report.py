@@ -36,10 +36,6 @@ except Exception as e:
 # BigQuery client
 client = bigquery.Client()
 
-# Define start and end date times
-start_date = '2024-05-13'  # Monday
-end_date = '2024-05-19'  # Sunday
-
 # Parameterized SQL Query
 query = """
 WITH transactions AS (
@@ -127,25 +123,6 @@ try:
     df.to_csv(csv_file_path, index=False)
 
     print(f"CSV file: {csv_file_name} exported successfully to: {csv_file_path}")
-
-    # Query 2 - Find unique purchases
-    query2 = """
-    SELECT
-       COUNT(DISTINCT(customer_id)) as unique_purchasers
-    FROM
-       `project-id.database.purchases`
-    WHERE
-       DATE(timestamp, 'America/New_York') BETWEEN @start AND @end
-    """
-
-    job_config = bigquery.QueryJobConfig(
-      query_parameters=[
-        bigquery.ScalarQueryParameter("start", "DATE", start_date),
-        bigquery.ScalarQueryParameter("end", "DATE", end_date)
-      ]
-    )
-    query_job2 = client.query(query2, job_config=job_config)
-    df2 = query_job2.to_dataframe()
 
 except Exception as e:
     # Handle any exceptions
