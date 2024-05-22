@@ -2,7 +2,7 @@ import os
 import pandas as pd
 from google.cloud import bigquery
 
-# BigQuery client
+# Initialize BigQuery client
 client = bigquery.Client()
 
 # Define start and end date times
@@ -28,50 +28,48 @@ try:
     if not os.path.exists(main_folder_path):
         os.makedirs(main_folder_path)
     print(f"Folder created at: {main_folder_path}")
+    
 except ValueError as ve:
     print(f"Error processing date formats: {ve}")
 except Exception as e:
     print(f"An unexpected error occurred: {e}")
 
-# BigQuery client
-client = bigquery.Client()
-
 # Parameterized SQL Query
 query = """
 WITH transactions AS (
     SELECT 
-      DATE(timestamp, 'America/New_York') as purchase_date, 
-      SUM(amount_usd) as total_purchases
+        DATE(timestamp, 'America/New_York') as purchase_date, 
+        SUM(amount_usd) as total_purchases
     FROM 
-      `project-id.database.transactions` t
+        `project-id.database.transactions` t
     WHERE 
-      DATE(timestamp, 'America/New_York') BETWEEN @start AND @end
+        DATE(timestamp, 'America/New_York') BETWEEN @start AND @end
     GROUP BY 
-      purchase_date
+        purchase_date
 ),
 expenses as(
     SELECT 
-      DATE(timestamp, 'America/New_York') as expense_date, 
-      SUM(expenses) as total_expenses
+        DATE(timestamp, 'America/New_York') as expense_date, 
+        SUM(expenses) as total_expenses
     FROM 
-      `project-id.database.expenses` t
+        `project-id.database.expenses` t
     WHERE 
-      DATE(timestamp, 'America/New_York') BETWEEN @start AND @end
+        DATE(timestamp, 'America/New_York') BETWEEN @start AND @end
     GROUP BY expense_date
 )
 SELECT 
-  day, 
-  FORMAT_DATE('%a', day) as day_of_the_week, 
-  t.total_purchases, 
-  e.total_expenses
+    day, 
+    FORMAT_DATE('%a', day) as day_of_the_week, 
+    t.total_purchases, 
+    e.total_expenses
 FROM 
-  UNNEST(GENERATE_DATE_ARRAY(DATE(@end), DATE(@start), INTERVAL -1 DAY)) AS day
-  LEFT JOIN transactions t ON t.purchase_date = day
-  LEFT JOIN expenses e ON e.expense_date = day
+    UNNEST(GENERATE_DATE_ARRAY(DATE(@end), DATE(@start), INTERVAL -1 DAY)) AS day
+    LEFT JOIN transactions t ON t.purchase_date = day
+    LEFT JOIN expenses e ON e.expense_date = day
 WHERE 
-  day BETWEEN @start AND @end
+    day BETWEEN @start AND @end
 ORDER BY 
-  day
+    day
 """
 
 # Set up query parameters
@@ -82,14 +80,10 @@ job_config = bigquery.QueryJobConfig(
     ]
 )
 
-# Execute the query
-query_job = client.query(query, job_config=job_config)
-df = query_job.to_dataframe()
-
 try:
-    # Run Query1 which is for the Report
-    query_job1 = client.query(query1)
-    df = query_job1.to_dataframe()
+    # Execute the query
+    query_job = client.query(query, job_config=job_config)
+    df = query_job.to_dataframe()
 
     # Function to calculate the difference between two columns
     def calculate_revenue(row):
@@ -102,14 +96,10 @@ try:
     print("Query results:")
     print(df)
 
-    # Create the main folder if it doesn't exist
-    if not os.path.exists(main_folder_path):
-        os.makedirs(main_folder_path)
-    
     # Define the CSV subfolder path
     csv_folder_path = os.path.join(main_folder_path, 'CSV')
 
-    # Create the CSV subfolder
+    # Create the CSV subfolder if it doesn't exist
     if not os.path.exists(csv_folder_path):
         os.makedirs(csv_folder_path)
 
