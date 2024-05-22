@@ -28,7 +28,6 @@ try:
     if not os.path.exists(main_folder_path):
         os.makedirs(main_folder_path)
     print(f"Folder created at: {main_folder_path}")
-    
 except ValueError as ve:
     print(f"Error processing date formats: {ve}")
 except Exception as e:
@@ -86,11 +85,12 @@ try:
     df = query_job.to_dataframe()
 
     # Function to calculate the difference between two columns
-    def calculate_revenue(row):
-        return row['total_purchases'] - row['total_expenses']
-
-    # Apply the custom function to create a new column
-    df['revenue'] = df.apply(calculate_revenue, axis=1)
+    def calculate_revenue(row):
+        total_purchases = row['total_purchases']
+        total_expenses = row['total_expenses']
+        if total_purchases is None or total_expenses is None:
+            return None
+        return total_purchases - total_expenses
 
     # Print DataFrame
     print("Query results:")
