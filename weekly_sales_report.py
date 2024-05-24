@@ -22,7 +22,7 @@ try:
     folder_name = f"{week_num} {start_date_formatted} to {end_date_formatted}"
 
     # Define path for main report folder and ensure it's created
-    main_folder_path = os.path.join(os.getcwd(), folder_name)
+    main_folder_path = os.path.join(r'computer\file\path', folder_name)
     if not os.path.exists(main_folder_path):
         os.makedirs(main_folder_path)
     print(f"Folder created at: {main_folder_path}")
