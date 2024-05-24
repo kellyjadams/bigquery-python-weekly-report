@@ -89,6 +89,9 @@ try:
             return None
         return total_purchases - total_expenses
 
+    # Apply the custom function to create a new column
+    df['revenue'] = df.apply(calculate_revenue, axis=1)
+    
     print("Query results:")
     print(df)
 
