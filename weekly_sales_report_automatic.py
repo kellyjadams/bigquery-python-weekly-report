@@ -5,18 +5,29 @@ from google.cloud import bigquery
 # Initialize BigQuery client to interact with the database
 client = bigquery.Client()
 
-# Define start and end date for the report period
-start_date = '2024-05-13'
-end_date = '2024-05-19'
-# Calculate week number for folder naming
-week_num = 20
+# Get the current date
+today = datetime.today()
+
+# Calculate start of the previous week (Monday)
+start_date = today - timedelta(days=today.weekday() + 7)
+
+# Calculate end of the previous week (Sunday)
+end_date = start_date + timedelta(days=6)
+
+# Calculate the week number for the previous week
+week_num = int(end_date.strftime('%U')) 
 
 # Format dates to more readable form for folder creation
 try:
-    start_date_components = start_date.split('-')
+    # Format start_date and end_date to strings for formatting
+    start_date_str = start_date.strftime('%Y-%m-%d')
+    end_date_str = end_date.strftime('%Y-%m-%d')
+
+    # Parse start_date and end_date into the desired format
+    start_date_components = start_date_str.split('-')
     start_date_formatted = f"{int(start_date_components[1]):g}-{int(start_date_components[2]):g}-{start_date_components[0][-2:]}"
 
-    end_date_components = end_date.split('-')
+    end_date_components = end_date_str.split('-')
     end_date_formatted = f"{int(end_date_components[1]):g}-{int(end_date_components[2]):g}-{end_date_components[0][-2:]}"
 
     folder_name = f"{week_num} {start_date_formatted} to {end_date_formatted}"
@@ -71,8 +82,8 @@ ORDER BY
 # Configure query parameters to safeguard against SQL injection and provide flexibility
 job_config = bigquery.QueryJobConfig(
     query_parameters=[
-        bigquery.ScalarQueryParameter("start", "STRING", start_date),
-        bigquery.ScalarQueryParameter("end", "STRING", end_date)
+        bigquery.ScalarQueryParameter("start", "STRING", start_date_str),
+        bigquery.ScalarQueryParameter("end", "STRING", end_date_str)
     ]
 )
 
