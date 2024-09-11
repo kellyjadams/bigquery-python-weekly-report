@@ -6,7 +6,7 @@ The Python script I use to automate part of my process for generating a weekly r
 
 ### Part 2
 
-New updated Python script that automatically updates the dates based on the current date. Read the article on that [here](). **work in progress**
+New updated Python script that automatically updates the dates based on the current date. Read the article on that [here](https://www.kellyjadams.com/post/how-i-automated-my-weekly-python-script).
 
 - [`weekly_sales_report_automatic.py`](weekly_sales_report_automatic.py) - Actual Python script which can be run by itself. 
 - [`run_weekly_report_script.bat`](run_weekly_report_script.bat) - A batch job that I use with Windows Task Scheduler to automatically run this script on my local computer. This only works with the `weekly_sales_report_automatic.py` file.
